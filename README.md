@@ -3,7 +3,7 @@ Hi! This repository is a temporary home for the 2019 EMNLP Systems Demonstration
 
 The source code of this project is a product of the US National Institutes of Health, developed in collaboration with the US Social Security Administration and The Ohio State University.  We are diligently working to identify an appropriate distribution method that complies with US federal regulations.
 
-To stay tuned for when the final code is released, just hit the "Star" button up above!
+To stay tuned for when the final code is released, just hit the "Watch" button up above!
 
 <img src="https://cc.nih.gov/internet/general/images/NIH_CC_logo.png" />
 
