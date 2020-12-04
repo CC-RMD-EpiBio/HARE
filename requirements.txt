@@ -1,0 +1,10 @@
+torch
+allennlp
+cli-configparser
+pyemblib
+hedgepig-logger
+tensorflow=1.12.0
+cudatoolkit=9.0
+flask
+h5py
+scikit-learn

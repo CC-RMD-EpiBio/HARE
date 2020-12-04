@@ -1,0 +1,190 @@
+<!--
+###############################################################################
+#
+#                           COPYRIGHT NOTICE
+#                  Mark O. Hatfield Clinical Research Center
+#                       National Institutes of Health
+#            United States Department of Health and Human Services
+#
+# This software was developed and is owned by the National Institutes of
+# Health Clinical Center (NIHCC), an agency of the United States Department
+# of Health and Human Services, which is making the software available to the
+# public for any commercial or non-commercial purpose under the following
+# open-source BSD license.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# 
+# (1) Redistributions of source code must retain this copyright
+# notice, this list of conditions and the following disclaimer.
+# 
+# (2) Redistributions in binary form must reproduce this copyright
+# notice, this list of conditions and the following disclaimer in the
+# documentation and/or other materials provided with the distribution.
+# 
+# (3) Neither the names of the National Institutes of Health Clinical
+# Center, the National Institutes of Health, the U.S. Department of
+# Health and Human Services, nor the names of any of the software
+# developers may be used to endorse or promote products derived from
+# this software without specific prior written permission.
+# 
+# (4) Please acknowledge NIHCC as the source of this software by including
+# the phrase "Courtesy of the U.S. National Institutes of Health Clinical
+# Center"or "Source: U.S. National Institutes of Health Clinical Center."
+# 
+# THIS SOFTWARE IS PROVIDED BY THE U.S. GOVERNMENT AND CONTRIBUTORS "AS
+# IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+# PARTICULAR PURPOSE ARE DISCLAIMED.
+# 
+# You are under no obligation whatsoever to provide any bug fixes,
+# patches, or upgrades to the features, functionality or performance of
+# the source code ("Enhancements") to anyone; however, if you choose to
+# make your Enhancements available either publicly, or directly to
+# the National Institutes of Health Clinical Center, without imposing a
+# separate written license agreement for such Enhancements, then you hereby
+# grant the following license: a non-exclusive, royalty-free perpetual license
+# to install, use, modify, prepare derivative works, incorporate into
+# other computer software, distribute, and sublicense such Enhancements or
+# derivative works thereof, in binary and source code form.
+#
+###############################################################################
+-->
+
+{% import 'macros.html' as macros %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Document annotations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='qualitative_analysis.css') }}">
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='annotation_settings.js') }}"></script>
+</head>
+<body id="qualitative_analysis">
+    {{ macros.appHeader() }}
+    
+    <div id="panel_header">
+        <div id="annotation_set_selector_container">
+            <form action="/qualitative" method="POST">
+                {{ macros.annot_set_dropdown(annot_sets) }}
+                {{ macros.hidden_annotation_settings(annotation_settings) }}
+                {{ macros.hidden_ranking_settings(ranking_settings) }}
+                {{ macros.hidden_lexicalization_settings(lexicalization_settings) }}
+            </form>
+        </div>
+        <div id="link_to_doc_list">
+            <form method="post" action="/list/{{ annot_set }}">
+                {{ macros.hidden_annotation_settings(annotation_settings) }}
+                {{ macros.hidden_ranking_settings(ranking_settings) }}
+                <input type="button" onclick="form.submit();" value="Back to document list" />
+            </form>
+        </div>
+    </div>
+
+    <div id="panel_lexicalization">
+        <h2>Lexicalization</h2>
+        <div id="lexicalization_filtered_report">
+            Number of words below minimum frequency: {{ lexicalization_stats.num_filtered }}
+        </div>
+        {% if labeled %}
+        <div id="lexicalization_rho_report">
+            Model/gold lexicalization ranking correlation (Spearman's rho): {{ lexicalization_stats.rho }}
+        </div>
+        {% endif %}
+        <table id="table_lexicalization>">
+            <!--<thead>-->
+                <tr>
+                    <th class="col-token">Token</th>
+                    <th class="col-model-lex">Model Lexicalization %</th>
+                    <th class="col-model-rank">Model Rank</th>
+                    {% if labeled %}
+                        <th class="col-gold-lex">Gold Lexicalization %</th>
+                        <th class="col-gold-rank">Gold Rank</th>
+                    {% endif %}
+                    <th class="col-token-freq">Token Frequency</th>
+                </tr>
+            <!--</thead>-->
+            <!--<tbody>-->
+                {% for lex in lexicalization_stats.lex_info %}
+                <tr>
+                    <td class="col-token">{{ lex.token }}</td>
+                    <td class="col-model-lex">{{ lex.model_lex_score }}</td>
+                    <td class="col-model-rank">{{ lex.model_rank }}</td>
+                    {% if labeled %}
+                        <td class="col-gold-lex">{{ lex.gold_lex_score }}</td>
+                        <td class="col-gold-rank">{{ lex.gold_rank }}</td>
+                    {% endif %}
+                    <td class="col-token-freq">{{ lex.count }}</td>
+                </tr>
+                {% endfor %}
+            <!--</tbody>-->
+        </table>
+    </div>
+
+    <div id="panel_score_patterns">
+        <div id="score_distribution_view">
+            <h2>Relevance score distribution</h2>
+            <div class="center-aligned">
+                {{ macros.showScoreDistribution(score_distrib_base64) }}
+            </div>
+        </div>
+        <div id="thresholding_distribution_view">
+            {% if labeled %}
+            <h2>Thresholding outcomes</h2>
+            <div class="center-aligned">
+                {{ macros.showThresholdingDistribution(thresholding_distrib_base64) }}
+            </div>
+
+            <div class="stat">
+                Best threshold: {{ best_threshold }}
+            </div>
+            <div class="stat">
+                Precision @ best threshold: {{ best_metrics.precision }}
+            </div>
+            <div class="stat">
+                Recall @ best threshold: {{ best_metrics.recall }}
+            </div>
+            <div class="stat">
+                F-2 @ best threshold: {{ best_metrics.f2 }}
+            </div>
+            <div class="stat">
+                AUC @ best threshold: {{ best_metrics.auc }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="panel_settings">
+        <div class="settings">
+            <form method="post" action="/qualitative/{{ annot_set }}">
+                {{ macros.annotation_settings(annotation_settings) }}
+                {{ macros.hidden_ranking_settings(ranking_settings) }}
+                {{ macros.lexicalization_settings(lexicalization_settings) }}
+            </form>
+        </div>
+
+        {% if labeled %}
+            <div class="header">
+                Annotation Evaluation Metrics
+            </div>
+            {{ macros.annotation_metrics(annotation_metrics) }}
+        {% endif %}
+        
+        <div class="header">
+            Model Annotation Statistics
+        </div>
+        {{ macros.annotation_statistics(model_statistics) }}
+        
+        {% if labeled %}
+            <div class="header">
+                Gold Annotation Statistics
+            </div>
+            {{ macros.annotation_statistics(gold_statistics) }}
+        {% endif %}
+    </div>
+
+</body>
+</html>

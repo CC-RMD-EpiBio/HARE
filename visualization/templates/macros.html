@@ -1,0 +1,243 @@
+<!--
+###############################################################################
+#
+#                           COPYRIGHT NOTICE
+#                  Mark O. Hatfield Clinical Research Center
+#                       National Institutes of Health
+#            United States Department of Health and Human Services
+#
+# This software was developed and is owned by the National Institutes of
+# Health Clinical Center (NIHCC), an agency of the United States Department
+# of Health and Human Services, which is making the software available to the
+# public for any commercial or non-commercial purpose under the following
+# open-source BSD license.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# 
+# (1) Redistributions of source code must retain this copyright
+# notice, this list of conditions and the following disclaimer.
+# 
+# (2) Redistributions in binary form must reproduce this copyright
+# notice, this list of conditions and the following disclaimer in the
+# documentation and/or other materials provided with the distribution.
+# 
+# (3) Neither the names of the National Institutes of Health Clinical
+# Center, the National Institutes of Health, the U.S. Department of
+# Health and Human Services, nor the names of any of the software
+# developers may be used to endorse or promote products derived from
+# this software without specific prior written permission.
+# 
+# (4) Please acknowledge NIHCC as the source of this software by including
+# the phrase "Courtesy of the U.S. National Institutes of Health Clinical
+# Center"or "Source: U.S. National Institutes of Health Clinical Center."
+# 
+# THIS SOFTWARE IS PROVIDED BY THE U.S. GOVERNMENT AND CONTRIBUTORS "AS
+# IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+# PARTICULAR PURPOSE ARE DISCLAIMED.
+# 
+# You are under no obligation whatsoever to provide any bug fixes,
+# patches, or upgrades to the features, functionality or performance of
+# the source code ("Enhancements") to anyone; however, if you choose to
+# make your Enhancements available either publicly, or directly to
+# the National Institutes of Health Clinical Center, without imposing a
+# separate written license agreement for such Enhancements, then you hereby
+# grant the following license: a non-exclusive, royalty-free perpetual license
+# to install, use, modify, prepare derivative works, incorporate into
+# other computer software, distribute, and sublicense such Enhancements or
+# derivative works thereof, in binary and source code form.
+#
+###############################################################################
+-->
+
+{% macro annotation_settings(annotation_settings) -%}
+<input id="old_threshold_storage" type="hidden" name="old_threshold" value="{{ threshold }}" />
+
+<div>
+    Threshold:
+    <input
+        id="threshold_input"
+        type="text"
+        name="threshold"
+        value="{{ annotation_settings.threshold }}" />
+</div>
+<div>
+    # Blanks:
+    <input
+        type="number"
+        name="num_blanks"
+        value="{{ annotation_settings.num_blanks }}"
+        onchange="form.submit();" />
+</div>
+<div>
+    Use Viterbi smoothing:
+    <input
+        type="checkbox"
+        name="viterbi_smoothing"
+        {% if annotation_settings.viterbi_smoothing %} checked="checked" {% endif %}
+        onchange="form.submit();" />
+</div>
+{%- endmacro %}
+
+{% macro hidden_annotation_settings(annotation_settings) -%}
+<input type="hidden" name="threshold" value="{{ annotation_settings.threshold }}" />
+<input type="hidden" name="num_blanks" value="{{ annotation_settings.num_blanks }}" />
+<input type="hidden" name="viterbi_smoothing" value="{{ annotation_settings.viterbi_smoothing }}" />
+<input type="hidden" name="min_probability" value="{{ annotation_settings.min_probability }}" />
+{%- endmacro %}
+
+{% macro ranking_settings(ranking_settings, scorer_options, labeled) -%}
+    {% if labeled %}
+        <div>
+            Gold scorer
+            <select name="gold_scorer" onchange="form.submit();">
+                {% for opt in scorer_options %}
+                    <option
+                        value="{{ opt }}"
+                        {% if opt == ranking_settings.gold_scorer %} selected="selected" {% endif %}
+                    >
+                        {{ opt }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    {% endif %}
+    <div>
+        Model scorer
+        <select name="model_scorer" onchange="form.submit();">
+            {% for opt in scorer_options %}
+                <option
+                    value="{{ opt }}"
+                    {% if opt == ranking_settings.model_scorer %} selected="selected" {% endif %}
+                >
+                    {{ opt }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    {% if labeled %}
+        <div class="setting">
+            Order by gold:
+            <input
+                type="checkbox"
+                name="order_by_gold"
+                {% if ranking_settings.order_by_gold %} checked="checked" {% endif %} 
+                onchange="form.submit();"
+                />
+        </div>
+        <div class="setting">
+            Show gold classes:
+            <input
+                type="checkbox"
+                name="class_by_gold"
+                {% if ranking_settings.class_by_gold %} checked="checked" {% endif %} 
+                onchange="form.submit();"
+                />
+        </div>
+    {% endif %}
+{%- endmacro %}
+
+{% macro hidden_ranking_settings(ranking_settings) -%}
+<input type="hidden" name="order_by_gold" value="{{ ranking_settings.order_by_gold }}" />
+<input type="hidden" name="class_by_gold" value="{{ ranking_settings.class_by_gold }}" />
+<input type="hidden" name="gold_scorer" value="{{ ranking_settings.gold_scorer }}" />
+<input type="hidden" name="model_scorer" value="{{ ranking_settings.model_scorer }}" />
+<input type="hidden" name="classification_method" value="{{ ranking_settings.classification_method }}" />
+<input type="hidden" name="classification_thresholds" value="{{ ranking_settings.classification_thresholds }}" />
+<input type="hidden" name="classification_colors" value="{{ ranking_settings.classification_colors }}" />
+{%- endmacro %}
+
+{% macro annot_set_dropdown(annot_sets) -%}
+Viewing annotations from:
+<select name="annot_set" onchange="form.submit();">
+    {% for set in annot_sets %}
+        <option
+            value="{{ set.name }}" 
+            {% if set.selected %} selected="selected" {% endif %}
+        >
+            {{ set.name }}
+        </option>
+    {% endfor %}
+</select>
+{%- endmacro %}
+
+{% macro lexicalization_settings(lex_settings) -%}
+<div>
+    Minimum frequency for lexicalization:
+    <input
+        type="number"
+        name="min_lexicalization_frequency"
+        value="{{ lex_settings.min_freq }}"
+        onchange="form.submit();" />
+</div>
+{%- endmacro %}
+
+{% macro hidden_lexicalization_settings(lex_settings) -%}
+<input type="hidden" name="min_lexicalization_frequency" value="{{ lex_settings.min_freq }}" />
+{%- endmacro %}
+
+{% macro annotation_metrics(metrics) -%}
+    <div class="stat">
+        Token-level accuracy: {{ metrics.accuracy }}
+    </div>
+    <div class="stat">
+        Token-level precision: {{ metrics.precision }}
+    </div>
+    <div class="stat">
+        Token-level recall: {{ metrics.recall }}
+    </div>
+    <div class="stat">
+        Token-level F-1: {{ metrics.f1 }}
+    </div>
+    <div class="stat">
+        Token-level F-2: {{ metrics.f2 }}
+    </div>
+{%- endmacro %}
+
+{% macro annotation_statistics(statistics) -%}
+    <div class="stat">
+        Mean segments per document:
+            {{ statistics.num_segments_mean }}
+            (+/- {{ statistics.num_segments_std }})
+    </div>
+    <div class="stat">
+        Min/max segments per document:
+            {{ statistics.num_segments_min }}/{{ statistics.num_segments_max }}
+    </div>
+    <div class="stat">
+        Mean segment length:
+            {{ statistics.segment_lengths_mean }}
+            (+/- {{ statistics.segment_lengths_std }})
+    </div>
+    <div class="stat">
+        Min/max segment length:
+            {{ statistics.segment_lengths_min }}/{{ statistics.segment_lengths_max }}
+    </div>
+{%- endmacro %}
+
+{% macro showScoreDistribution(base64_data) -%}
+    <img class="score_distribution" src="data:image/png;base64,{{ base64_data }}" />
+{%- endmacro %}
+
+{% macro showThresholdingDistribution(base64_data) -%}
+    <img class="thresholding_distribution" src="data:image/png;base64,{{ base64_data }}" />
+{%- endmacro %}
+
+{% macro appHeader() -%}
+    <div id="panel_app_header">
+        <div id="NIH_logo_wrapper">
+            <img id="NIH_logo" src="/static/NIHCC_logo.png" width="150px" height="27px" />
+        </div>
+        <div id="OSU_logo_wrapper">
+            <img id="OSU_logo" src="/static/OSU_logo.png" width="180px" height="27px" />
+        </div>
+        <div id="app_title">
+            <span class="big_letter">H</span>ighlighting
+            <span class="big_letter">A</span>nnotator for<br/>
+            <span class="big_letter">R</span>anking and
+            <span class="big_letter">E</span>xploration
+        </div>
+    </div>
+    <div id="panel_logo_wrapper"><div id="panel_logo"></div><!--<div id="app_title">HARE</div>--></div>
+{%- endmacro %}
