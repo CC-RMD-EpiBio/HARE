@@ -1,5 +1,12 @@
 # HARE: Highlighting Annotator for Ranking and Exploration
 
+## Update as of June 2026
+This repository has been archived and is no longer maintained.
+The code is provided for historical reference and may contain unpatched or unknown vulnerabilities.
+It should not be used in production systems.
+
+## Background
+
 This open-source software package implements two components of a pipeline for identifying information relevant to a specific topic in text documents:
 
 1. **Machine-learning backend**, for training and testing a machine-learning based neural network model that assigns a relevance score to each token in a document;
